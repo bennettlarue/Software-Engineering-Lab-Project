@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MyApp</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f9f9f9;
+                color: #333;
+            }
+
+            form {
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            h4 {
+                color: #555;
+                margin-bottom: 10px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+            input,
+            button {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            button {
+                background-color: #008cba;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #005f5f;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Login Form -->
+        <form
+            id="login-form"
+            method="POST"
+            action="/api/login"
+            onsubmit="loginWithInfo(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Login</h4>
+            <label for="username">Username</label>
+            <input type="text" name="username" required /><br />
+            <label for="password">Password</label>
+            <input type="password" name="password" required /><br />
+            <button type="submit">Login</button>
+        </form>
+        <br />
+
+        <!-- Add Value Form -->
+        <form
+            id="add-value-form"
+            method="POST"
+            action="/api/add_data_entry"
+            onsubmit="sendDataEntry(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Add Value</h4>
+            <label for="add_column_index">Column Index</label>
+            <input type="text" name="add_column_index" required /><br />
+            <label for="add_value">Data Value</label>
+            <input type="text" name="add_value" required /><br />
+            <button type="submit">Add data entry</button>
+        </form>
+        <br />
+
+        <form
+            id="remove-value-form"
+            method="POST"
+            action="/api/remove_data_entry"
+            onsubmit="removeDataEntry(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Remove Value</h4>
+            <label for="remove_column_index">Column Index</label>
+            <input type="text" name="remove_column_index" required /><br />
+            <label for="remove_row_index">Row Index</label>
+            <input type="text" name="remove_row_index" required /><br />
+            <button type="submit">Remove data entry</button>
+        </form>
+        <br />
+
+        <!-- Generate Bar Graph Form -->
+        <form
+            id="generate-bar-graph-form"
+            method="POST"
+            action="/api/generate_bar_graph"
+            onsubmit="generateBarGraph(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Generate Bar Graph</h4>
+            <button type="submit">Generate Bar Graph</button>
+        </form>
+        <br />
+
+        <!-- Generate Line Graph Form -->
+        <form
+            id="generate-line-graph-form"
+            method="POST"
+            action="/api/generate_line_graph"
+            onsubmit="generateLineGraph(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Generate Line Graph</h4>
+            <button type="submit">Generate Line Graph</button>
+        </form>
+        <br />
+
+        <!-- Generate Scatter Plot Form -->
+        <form
+            id="generate-scatter-plot-form"
+            method="POST"
+            action="/api/generate_scatter_plot"
+            onsubmit="generateScatterPlot(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Generate Scatter Plot</h4>
+            <button type="submit">Generate Scatter Plot</button>
+        </form>
+        <br />
+
+        <!-- Generate Data Analysis Form -->
+        <form
+            id="generate-data-analysis-form"
+            method="POST"
+            action="/api/generate_data_analysis"
+            onsubmit="generateDataAnalysis(event); return false;"
+        >
+            {{ form.hidden_tag() }}
+            <h4>Generate Data Analysis</h4>
+            <button type="submit">Generate Data Analysis</button>
+        </form>
+        <br />
+
+        <script>
+            async function handleFormSubmit(event, formId) {
+                event.preventDefault(); // Prevent the form from being submitted the traditional way
+                const form = document.getElementById(formId);
+                const url = form.action;
+
+                const formData = new FormData(form);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    const responseData = await response.json();
+
+                    if (!response.ok) {
+                        let message = "Error: ";
+                        for (let [key, value] of Object.entries(
+                            responseData.errors
+                        )) {
+                            message += `${key}: ${value.join(", ")}. `;
+                        }
+                        alert(message);
+                    } else {
+                        alert(responseData.message);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("An error occurred. Please try again.");
+                }
+            }
+
+            function loginWithInfo(event) {
+                handleFormSubmit(event, "login-form");
+            }
+
+            function sendDataEntry(event) {
+                handleFormSubmit(event, "add-value-form");
+            }
+
+            function removeDataEntry(event) {
+                handleFormSubmit(event, "remove-value-form");
+            }
+
+            function generateBarGraph(event) {
+                handleFormSubmit(event, "generate-bar-graph-form");
+            }
+
+            function generateLineGraph(event) {
+                handleFormSubmit(event, "generate-line-graph-form");
+            }
+
+            function generateScatterPlot(event) {
+                handleFormSubmit(event, "generate-scatter-plot-form");
+            }
+
+            function generateDataAnalysis(event) {
+                handleFormSubmit(event, "generate-data-analysis-form");
+            }
+        </script>
+    </body>
+</html>
